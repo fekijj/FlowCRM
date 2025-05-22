@@ -27,6 +27,8 @@ class PC(Base):
     mac_address = Column(String)
     is_online = Column(Boolean, default=False)
     in_use = Column(Boolean, default=False)
+    position = Column(Integer, default=0)
+    sessions = relationship("Session", backref="pc")
 
 
 class Session(Base):
@@ -57,3 +59,6 @@ class Sale(Base):
     quantity = Column(Integer, default=1)
     total_price = Column(Float)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    product = relationship("Product")
+    user = relationship("User")

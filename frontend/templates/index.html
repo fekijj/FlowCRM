@@ -1,19 +1,78 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>FlowCRM</title>
-  <script>
-    async function shutdown() {
-      const res = await fetch('/shutdown', { method: 'POST' });
-      alert(await res.text());
-    }
-  </script>
+  <meta charset="UTF-8" />
+  <title>FlowCRM | Главная</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body style="font-family: sans-serif; padding: 2em;">
-  <h1>FlowCRM работает ✅</h1>
-  <button onclick="shutdown()" style="margin-top: 1em; padding: 1em; background: red; color: white;">
-    Отключить сервер
-  </button>
+<body class="bg-gray-900 text-white min-h-screen font-sans">
+  <div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+<aside class="w-64 bg-gray-800 p-6 flex flex-col">
+  <div>
+    <a href="/" class="block text-2xl font-bold mb-6 hover:text-blue-400 transition">FlowCRM</a>
+    <nav class="flex flex-col space-y-3 text-sm">
+      <a href="/map" class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 transition">Карта клуба</a>
+      <a href="/sales" class="hover:text-blue-400">🛒 Продажи</a>
+      <a href="/stats" class="hover:text-blue-400">📊 Статистика</a>
+      <a href="/users" class="hover:text-blue-400">👥 Сотрудники</a>
+    </nav>
+  </div>
+  <div class="mt-auto">
+    <form action="/shutdown" method="post" onsubmit="return confirm('Выключить сервер?')">
+      <button type="submit" class="text-left text-red-500 hover:text-red-400 mt-6">⛔ Выключить</button>
+    </form>
+  </div>
+</aside>
+
+    <!-- Main content -->
+    <main class="flex-1 p-8">
+      <h2 class="text-3xl font-semibold mb-6">Добро пожаловать в FlowCRM 👋</h2>
+
+      <!-- Виджеты -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="bg-gray-800 p-6 rounded-lg shadow hover:shadow-xl transition">
+          <p class="text-sm text-gray-400 mb-1">Активных ПК</p>
+          <h3 id="active-pcs" class="text-2xl font-bold text-green-400">...</h3>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-lg shadow hover:shadow-xl transition">
+          <p class="text-sm text-gray-400 mb-1">Продаж за сегодня</p>
+          <h3 id="sales-today" class="text-2xl font-bold text-yellow-300">...</h3>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-lg shadow hover:shadow-xl transition">
+          <p class="text-sm text-gray-400 mb-1">Выручка</p>
+          <h3 id="total-revenue" class="text-2xl font-bold text-blue-300">... ₽</h3>
+        </div>
+      </div>
+
+      <!-- Быстрые действия -->
+      <div class="bg-gray-800 p-6 rounded-lg shadow">
+        <h4 class="text-xl font-semibold mb-4">Быстрые действия</h4>
+        <div class="flex flex-wrap gap-4">
+          <a href="/pcs" class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 transition">Управление ПК</a>
+          <a href="/sales" class="px-4 py-2 bg-green-600 rounded hover:bg-green-500 transition">Продажи</a>
+          <a href="/stats" class="px-4 py-2 bg-purple-600 rounded hover:bg-purple-500 transition">Отчёты</a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    async function loadStats() {
+      try {
+        const pcs = await fetch('/api/pcs').then(r => r.json());
+        document.getElementById('active-pcs').textContent = pcs.filter(pc => pc.is_online).length;
+
+        const stats = await fetch('/api/stats').then(r => r.json());
+        document.getElementById('sales-today').textContent = stats.sales_today;
+        document.getElementById('total-revenue').textContent = stats.total_revenue + ' ₽';
+      } catch (err) {
+        console.error("Ошибка при загрузке данных:", err);
+      }
+    }
+    loadStats();
+  </script>
 </body>
 </html>

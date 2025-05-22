@@ -5,6 +5,9 @@ import time
 from backend.app import create_app
 import asyncio
 from backend.telegram_bot import run_bot
+from backend.models import Base, engine
+Base.metadata.create_all(engine)
+
 
 def run_flask():
     app = create_app()

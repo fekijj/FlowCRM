@@ -1,0 +1,28 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title or "FlowCRM" }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-gray-800 p-4 min-h-screen">
+    <h1 class="text-2xl font-bold mb-4">FlowCRM</h1>
+    <nav class="flex flex-col space-y-2 text-sm">
+      <a href="/map" class="hover:text-blue-400">🗺 Карта клуба</a>
+      <a href="/sales" class="hover:text-blue-400">🛒 Продажи</a>
+      <a href="/stats" class="hover:text-blue-400">📊 Статистика</a>
+      <a href="/users" class="hover:text-blue-400">👥 Сотрудники</a>
+      <form action="/shutdown" method="post" onsubmit="return confirm('Выключить сервер?')">
+        <button type="submit" class="text-left text-red-500 hover:text-red-400 mt-4">⛔ Выключить</button>
+      </form>
+    </nav>
+  </aside>
+  <!-- Main -->
+  <main class="flex-1 p-6">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
