@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>FlowCRM</title>
+  <script>
+    async function shutdown() {
+      const res = await fetch('/shutdown', { method: 'POST' });
+      alert(await res.text());
+    }
+  </script>
+</head>
+<body style="font-family: sans-serif; padding: 2em;">
+  <h1>FlowCRM работает ✅</h1>
+  <button onclick="shutdown()" style="margin-top: 1em; padding: 1em; background: red; color: white;">
+    Отключить сервер
+  </button>
+</body>
+</html>

@@ -1,0 +1,4 @@
+flask
+aiogram>=3.0.0
+sqlalchemy
+jinja2
