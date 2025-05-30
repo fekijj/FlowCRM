@@ -3,21 +3,29 @@ from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 engine = create_engine("sqlite:///backend/database.db", echo=False)
 Base = declarative_base()
 SessionLocal = sessionmaker(bind=engine)
 
-
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    login = Column(String, unique=True, nullable=False)
+    password_hash = Column(String, nullable=False)
+    role = Column(String, default="employee")  # admin или employee
     telegram_id = Column(String, unique=True, nullable=True)
     balance = Column(Float, default=0.0)
 
     sessions = relationship("Session", back_populates="user")
 
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 class PC(Base):
     __tablename__ = "pcs"
@@ -42,14 +50,12 @@ class Session(Base):
 
     user = relationship("User", back_populates="sessions")
 
-
 class Product(Base):
     __tablename__ = "products"
     id = Column(Integer, primary_key=True)
     name = Column(String)
     price = Column(Float)
     category = Column(String)  # Еда, напитки, аксессуары и т.п.
-
 
 class Sale(Base):
     __tablename__ = "sales"

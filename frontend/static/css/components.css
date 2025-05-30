@@ -1,0 +1,15 @@
+.card {
+  @apply bg-gray-800 p-6 rounded-lg shadow text-white hover:shadow-xl transition;
+}
+
+.status-indicator {
+  @apply flex items-center space-x-4 mb-4;
+}
+
+.status-indicator span {
+  @apply flex items-center text-sm;
+}
+
+.status-indicator span span {
+  @apply w-4 h-4 rounded mr-2;
+}

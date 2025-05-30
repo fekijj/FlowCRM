@@ -1,0 +1,7 @@
+.pc-grid {
+  @apply grid grid-cols-6 gap-4;
+}
+
+.pc-box {
+  @apply p-4 rounded text-center text-sm cursor-move shadow transition select-none text-white;
+}

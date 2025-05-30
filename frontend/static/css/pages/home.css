@@ -1,0 +1,23 @@
+.widget {
+  @apply bg-gray-800 p-6 rounded-lg shadow hover:shadow-xl transition;
+}
+
+.quick-actions {
+  @apply bg-gray-800 p-6 rounded-lg shadow mt-4;
+}
+
+.quick-actions a {
+  @apply px-4 py-2 rounded text-white transition;
+}
+
+.quick-actions a:nth-child(1) {
+  @apply bg-blue-600 hover:bg-blue-500;
+}
+
+.quick-actions a:nth-child(2) {
+  @apply bg-green-600 hover:bg-green-500;
+}
+
+.quick-actions a:nth-child(3) {
+  @apply bg-purple-600 hover:bg-purple-500;
+}

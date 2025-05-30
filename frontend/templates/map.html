@@ -2,13 +2,13 @@
 {% block content %}
 <h2 class="text-2xl font-bold mb-6">Карта клуба</h2>
 
-<div class="mb-4 flex items-center space-x-4">
+<div class="mb-4 flex items-center space-x-4 text-sm">
   <span class="flex items-center"><span class="w-4 h-4 bg-green-500 rounded mr-2"></span>Свободен</span>
   <span class="flex items-center"><span class="w-4 h-4 bg-red-500 rounded mr-2"></span>Занят</span>
   <span class="flex items-center"><span class="w-4 h-4 bg-gray-500 rounded mr-2"></span>Оффлайн</span>
 </div>
 
-<div id="pc-grid" class="grid grid-cols-6 gap-4">
+<div id="pc-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
   {% for pc in pcs|sort(attribute='position') %}
   <div
     class="p-4 rounded text-center text-sm cursor-move shadow transition select-none text-white"
@@ -25,38 +25,5 @@
   {% endfor %}
 </div>
 
-<script>
-  const grid = document.getElementById('pc-grid');
-  let draggedEl = null;
-
-  grid.addEventListener('dragstart', e => {
-    if (e.target.matches('[draggable]')) {
-      draggedEl = e.target;
-    }
-  });
-
-  grid.addEventListener('dragover', e => {
-    e.preventDefault();
-    const target = e.target.closest('[draggable]');
-    if (target && target !== draggedEl) {
-      const draggedIndex = [...grid.children].indexOf(draggedEl);
-      const targetIndex = [...grid.children].indexOf(target);
-      if (draggedIndex < targetIndex) {
-        grid.insertBefore(draggedEl, target.nextSibling);
-      } else {
-        grid.insertBefore(draggedEl, target);
-      }
-    }
-  });
-
-  grid.addEventListener('drop', async () => {
-    const order = [...grid.children].map(el => el.dataset.id);
-    await fetch("/map/update-order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ order })
-    });
-  });
-</script>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
 {% endblock %}
-"""

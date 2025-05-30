@@ -1,8 +1,9 @@
-from flask import jsonify, render_template, request, redirect, url_for
+from flask import jsonify, render_template, request, redirect, url_for, session, flash, redirect
 import os
 import threading
 from datetime import date
 from sqlalchemy import func
+from functools import wraps
 from backend.models import SessionLocal, PC, Sale
 from backend.utils import wake_on_lan
 
@@ -10,7 +11,8 @@ def register_routes(app):
 
     @app.route("/")
     def index():
-        return render_template("index.html")
+        return render_template("home.html")
+
 
     @app.route("/shutdown", methods=["POST"])
     def shutdown():
@@ -51,8 +53,13 @@ def register_routes(app):
     @app.route("/map")
     def map_view():
         db = SessionLocal()
-        pcs = db.query(PC).order_by(PC.position).all()
-        return render_template("map.html", title="Карта клуба", pcs=pcs)
+        try:
+            pcs = db.query(PC).order_by(PC.position).all()
+            return render_template("map.html", pcs=pcs)
+        except Exception as e:
+            print("Ошибка:", e)
+            return "Ошибка при отображении карты", 500
+
 
     @app.route("/map/update-order", methods=["POST"])
     def update_pc_order():
@@ -73,3 +80,46 @@ def register_routes(app):
         if pc:
             wake_on_lan(pc.mac_address)
         return redirect(url_for('map_view'))
+
+    
+    @app.route("/login", methods=["GET", "POST"])
+    def login():
+        db = SessionLocal()
+        if request.method == "POST":
+            login = request.form.get("login")
+            password = request.form.get("password")
+            user = db.query(User).filter(User.login == login).first()
+        if user and user.check_password(password):
+            session["user_id"] = user.id
+            session["user_role"] = user.role
+            return redirect("/")
+        flash("Неверный логин или пароль", "error")
+        return render_template("login.html")
+    
+    @app.route("/logout")
+    def logout():
+        session.clear()
+        return redirect("/login")
+    
+    def login_required(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            if "user_id" not in session:
+                return redirect("/login")
+            return f(*args, **kwargs)
+        return wrapper
+
+    def admin_required(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            if session.get("user_role") != "admin":
+                return "Доступ запрещён", 403
+            return f(*args, **kwargs)
+        return wrapper
+
+    @app.route("/admin/employees")
+    @admin_required
+    def admin_employees():
+        db = SessionLocal()
+        employees = db.query(User).all()
+        return render_template("admin_employees.html", employees=employees)

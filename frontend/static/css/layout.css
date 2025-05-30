@@ -1,0 +1,7 @@
+.sidebar {
+  @apply w-64 bg-gray-800 p-4 min-h-screen;
+}
+
+.logo-title {
+  @apply text-3xl font-extrabold text-white hover:text-blue-400 tracking-wide block mb-8 mt-2 px-2;
+}
