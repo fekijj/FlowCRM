@@ -2,26 +2,54 @@
 {% block content %}
 <h2 class="text-2xl font-bold mb-6">Карта клуба</h2>
 
-<div class="mb-4 flex items-center space-x-4 text-sm">
-  <span class="flex items-center"><span class="w-4 h-4 bg-green-500 rounded mr-2"></span>Свободен</span>
-  <span class="flex items-center"><span class="w-4 h-4 bg-red-500 rounded mr-2"></span>Занят</span>
-  <span class="flex items-center"><span class="w-4 h-4 bg-gray-500 rounded mr-2"></span>Оффлайн</span>
+<!-- Легенда -->
+<div class="flex space-x-6 mb-4 text-sm">
+  <div class="flex items-center"><span class="w-4 h-4 bg-green-500 rounded mr-2"></span>Свободен</div>
+  <div class="flex items-center"><span class="w-4 h-4 bg-red-500 rounded mr-2"></span>Занят</div>
+  <div class="flex items-center"><span class="w-4 h-4 bg-gray-500 rounded mr-2"></span>Оффлайн</div>
 </div>
 
-<div id="pc-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-  {% for pc in pcs|sort(attribute='position') %}
+<!-- Карта -->
+<div id="map-area"
+     class="relative w-full h-[600px] bg-gray-800 rounded border border-gray-600 overflow-hidden">
+  {% for pc in pcs %}
   <div
-    class="p-4 rounded text-center text-sm cursor-move shadow transition select-none text-white"
-    draggable="true"
-    data-id="{{ pc.id }}"
-    style="background-color: {{
-      'green' if pc.is_online and not pc.in_use else
-      'red' if pc.is_online and pc.in_use else
-      'gray'
-    }};">
-    <div class="font-bold mb-1">#{{ pc.name }}</div>
-    <div class="text-xs">{{ pc.ip_address }}</div>
+  class="absolute w-32 h-auto rounded text-xs shadow flex flex-col items-center justify-start select-none py-2 px-2"
+  style="left: {{ pc.pos_x }}px; top: {{ pc.pos_y }}px;
+         background-color: {{
+           'green' if pc.is_online and not pc.in_use else
+           'red' if pc.is_online and pc.in_use else
+           'gray'
+         }};"
+  draggable="true"
+  data-id="{{ pc.id }}"
+>
+  <div class="font-bold text-white text-sm mb-1">{{ pc.name }}</div>
+  <div class="text-gray-300 mb-2">{{ pc.ip_address }}</div>
+
+  {% if pc.in_use %}
+    <div class="text-yellow-300 text-[11px] mb-1">
+      До {{ pc.session_end.strftime('%H:%M') if pc.session_end else '—' }}
+    </div>
+    {% endif %}
+
+    <form method="post" action="/map/{{ pc.id }}/wake">
+      <button class="w-full mb-1 bg-yellow-400 hover:bg-yellow-300 text-black rounded px-2 py-1 text-xs">Включить</button>
+    </form>
+
+    <form method="post" action="/map/{{ pc.id }}/reboot">
+      <button class="w-full mb-1 bg-blue-500 hover:bg-blue-400 text-white rounded px-2 py-1 text-xs">Перезагрузить</button>
+    </form>
+
+    <form method="post" action="/map/{{ pc.id }}/start">
+      <button class="w-full mb-1 bg-green-600 hover:bg-green-500 text-white rounded px-2 py-1 text-xs">Начать</button>
+    </form>
+
+    <form method="post" action="/map/{{ pc.id }}/stop">
+      <button class="w-full bg-red-600 hover:bg-red-500 text-white rounded px-2 py-1 text-xs">Завершить</button>
+    </form>
   </div>
+
   {% endfor %}
 </div>
 

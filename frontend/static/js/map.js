@@ -1,37 +1,39 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const grid = document.getElementById('pc-grid');
-  let draggedEl = null;
+  const map = document.getElementById('map-area');
+  const pcs = map.querySelectorAll('[draggable]');
 
-  grid.addEventListener('dragstart', e => {
-    if (e.target.matches('[draggable]')) {
-      draggedEl = e.target;
-    }
+  pcs.forEach(pc => {
+    pc.addEventListener('dragstart', (e) => {
+      const rect = pc.getBoundingClientRect();
+      e.dataTransfer.setData('offsetX', e.clientX - rect.left);
+      e.dataTransfer.setData('offsetY', e.clientY - rect.top);
+      e.dataTransfer.setData('id', pc.dataset.id);
+    });
   });
 
-  grid.addEventListener('dragover', e => {
+  map.addEventListener('dragover', e => e.preventDefault());
+
+  map.addEventListener('drop', async e => {
     e.preventDefault();
-    const target = e.target.closest('[draggable]');
-    if (target && target !== draggedEl) {
-      const draggedIndex = [...grid.children].indexOf(draggedEl);
-      const targetIndex = [...grid.children].indexOf(target);
-      if (draggedIndex < targetIndex) {
-        grid.insertBefore(draggedEl, target.nextSibling);
-      } else {
-        grid.insertBefore(draggedEl, target);
-      }
-    }
-  });
+    const offsetX = +e.dataTransfer.getData('offsetX');
+    const offsetY = +e.dataTransfer.getData('offsetY');
+    const id = e.dataTransfer.getData('id');
 
-  grid.addEventListener('drop', async () => {
-    const order = [...grid.children].map(el => el.dataset.id);
+    const x = e.offsetX - offsetX;
+    const y = e.offsetY - offsetY;
+
+    const el = document.querySelector(`[data-id='${id}']`);
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+
     try {
-      await fetch("/map/update-order", {
+      await fetch("/map/update-position", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ order })
+        body: JSON.stringify({ id, x, y })
       });
     } catch (error) {
-      console.error("Ошибка при сохранении порядка:", error);
+      console.error("Ошибка при сохранении позиции:", error);
     }
   });
 });
